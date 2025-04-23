@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#F5F5F5"
+    android:gravity="center_horizontal">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tải lên video của bạn"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- EditText để nhập tiêu đề video -->
+    <EditText
+        android:id="@+id/etVideoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edit_text_background"
+        android:hint="Nhập tiêu đề video"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:singleLine="true"
+        android:textColor="#333333"
+        android:textColorHint="#888888"
+        android:textSize="16sp" />
+
+    <!-- EditText để nhập mô tả video -->
+    <EditText
+        android:id="@+id/etVideoDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập mô tả video"
+        android:inputType="textMultiLine"
+        android:imeOptions="actionDone"
+        android:minLines="3"
+        android:maxLines="5"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_background"
+        android:layout_marginBottom="24dp"
+        android:textSize="16sp"
+        android:textColor="#333333"
+        android:textColorHint="#888888" />
+
+    <!-- Nút cập nhật ảnh profile -->
+    <Button
+        android:id="@+id/btnUploadImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cập nhật ảnh profile"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Nút chọn video -->
+    <Button
+        android:id="@+id/btnSelectVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn Video"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Nút upload video -->
+    <Button
+        android:id="@+id/btnUploadVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Video"
+        android:enabled="false"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp" />
+
+    <!-- TextView hiển thị trạng thái -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Trạng thái: Chưa upload"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Nút xem short video -->
+    <Button
+        android:id="@+id/btnShortVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xem short video"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/button_background"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+
+</LinearLayout>
