@@ -1,10 +1,30 @@
 {
   "project_info": {
     "project_number": "304295376777",
+    "firebase_url": "https://viewshortbt10-default-rtdb.firebaseio.com",
     "project_id": "viewshortbt10",
     "storage_bucket": "viewshortbt10.firebasestorage.app"
   },
   "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304295376777:android:ddcd620a625e188ea1d358",
+        "android_client_info": {
+          "package_name": "com.example.firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMVnF6OBf4ft02met-o660jTGtj_mSwCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:304295376777:android:dc81b882fdb1b9a4a1d358",

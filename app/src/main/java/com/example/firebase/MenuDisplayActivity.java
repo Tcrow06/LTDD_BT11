@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -56,7 +57,7 @@ public class MenuDisplayActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Khởi tạo Firebase Database với URL đúng
-        FirebaseDatabase.getInstance("https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app");
+        FirebaseDatabase.getInstance();
 
         // Liên kết với UI
         btnSelectVideo = findViewById(R.id.btnSelectVideo);
@@ -102,6 +103,7 @@ public class MenuDisplayActivity extends AppCompatActivity {
         // Xem short video
         btnShortVideo.setOnClickListener(v -> {
             if (mAuth.getCurrentUser() == null) {
+                Snackbar.make(v, "Bạn cần đăng nhập để xem video!", Snackbar.LENGTH_LONG).show();
                 Toast.makeText(this, "Bạn cần đăng nhập để xem video!", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -200,10 +202,7 @@ public class MenuDisplayActivity extends AppCompatActivity {
         String username = currentUser.getDisplayName() != null ?
                 currentUser.getDisplayName() : (email != null ? email.split("@")[0] : "User");
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("userprofile").child(userId);
-
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("userprofile").child(userId);
         Map<String, Object> updates = new HashMap<>();
         updates.put("userId", userId);
         updates.put("email", email);
@@ -236,12 +235,16 @@ public class MenuDisplayActivity extends AppCompatActivity {
         }
 
         if (videoUri == null) {
+            View v = findViewById(R.id.main);
+            Snackbar.make(v, "Vui lòng chọn video trước khi upload!", Snackbar.LENGTH_LONG).show();
             Toast.makeText(this, "Vui lòng chọn video trước khi upload!", Toast.LENGTH_LONG).show();
             return;
         }
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
+            View v = findViewById(R.id.main);
+            Snackbar.make(v, "Bạn cần đăng nhập để upload video!", Snackbar.LENGTH_LONG).show();
             Toast.makeText(this, "Bạn cần đăng nhập để upload video!", Toast.LENGTH_LONG).show();
             return;
         }
@@ -253,7 +256,8 @@ public class MenuDisplayActivity extends AppCompatActivity {
         String userId = currentUser.getUid();
 
         MediaManager.get().upload(videoUri)
-                .unsigned("my_unsigned_preset")
+//                .unsigned("my_unsigned_preset")
+                .unsigned("save_data")
                 .option("resource_type", "video")
                 .callback(new UploadCallback() {
                     @Override
@@ -275,7 +279,7 @@ public class MenuDisplayActivity extends AppCompatActivity {
                         Log.d("UploadVideo", "Video URL: " + videoUrl);
 
                         DatabaseReference videosRef = FirebaseDatabase.getInstance()
-                                .getReference("shortvideo");
+                                .getReference("videos");
                         String videoId = videosRef.push().getKey();
 
                         Video1Model video = new Video1Model(
@@ -364,8 +368,7 @@ public class MenuDisplayActivity extends AppCompatActivity {
 
                         Log.d("UploadImage", "Image URL: " + imageUrl);
 
-                        DatabaseReference userRef = FirebaseDatabase.getInstance(
-                                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
+                        DatabaseReference userRef = FirebaseDatabase.getInstance()
                                 .getReference("userprofile").child(userId);
 
                         Map<String, Object> updates = new HashMap<>();

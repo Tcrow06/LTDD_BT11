@@ -16,7 +16,8 @@ public class MyApplication extends Application {
 
     private void initCloudinary() {
         Map config = new HashMap();
-        config.put("cloud_name", "dxxx4z4nu");
+//        config.put("cloud_name", "dxxx4z4nu");
+        config.put("cloud_name", "drqr7ric3");
         MediaManager.init(this, config);
     }
 }

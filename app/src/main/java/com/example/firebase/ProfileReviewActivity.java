@@ -135,9 +135,7 @@ public class ProfileReviewActivity extends AppCompatActivity {
                         Log.d("UploadImage", "Image URL: " + imageUrl);
 
                         // Lưu URL ảnh vào Realtime Database
-                        DatabaseReference userRef = FirebaseDatabase.getInstance(
-                                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                                .getReference("userprofile").child(userId);
+                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("userprofile").child(userId);
 
                         Map<String, Object> updates = new HashMap<>();
                         updates.put("profileImageUrl", imageUrl);
@@ -183,10 +181,7 @@ public class ProfileReviewActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfile() {
-        DatabaseReference userRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("userprofile").child(userId);
-
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("userprofile").child(userId);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -215,10 +210,7 @@ public class ProfileReviewActivity extends AppCompatActivity {
     }
 
     private void fetchVideoCount() {
-        DatabaseReference videosRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("shortvideo");
-
+        DatabaseReference videosRef = FirebaseDatabase.getInstance().getReference("videos");
         videosRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -234,9 +226,7 @@ public class ProfileReviewActivity extends AppCompatActivity {
     }
 
     private void updateProfile(String userId, String newEmail) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("userprofile").child(userId);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("userprofile").child(userId);
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("email", newEmail);

@@ -6,9 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,6 +38,9 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
     private List<Video1Model> videoList;
     private Context context;
 
+    private VideoViewHolder currentPlayingHolder;
+
+
     public VideosFireBaseAdapter(List<Video1Model> videoList) {
         this.videoList = videoList;
         Log.d("VideosFireBaseAdapter", "Adapter initialized with " + (videoList != null ? videoList.size() : 0) + " videos");
@@ -51,6 +56,11 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
 
     @Override
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
+
+        if (currentPlayingHolder != null && currentPlayingHolder != holder) {
+            currentPlayingHolder.videoView.pause();
+        }
+        currentPlayingHolder = holder;
         Log.d("VideosFireBaseAdapter", "onBindViewHolder called for position: " + position);
         Video1Model video = videoList.get(position);
 
@@ -69,10 +79,7 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
         }
 
         Log.d("VideosFireBaseAdapter", "Querying userprofile for userId: " + userId);
-        DatabaseReference userRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("userprofile").child(userId);
-
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("userprofile").child(userId);;
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -162,10 +169,34 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
 
         holder.videoView.setVideoURI(Uri.parse(video.getVideoUrl()));
         holder.videoView.setOnPreparedListener(mp -> {
+
+
+
             Log.d("VideosFireBaseAdapter", "Video prepared for position: " + position);
             holder.videoProgressBar.setVisibility(View.GONE);
+
             mp.start();
             mp.setLooping(true);
+
+            int videoWidth = mp.getVideoWidth();
+            int videoHeight = mp.getVideoHeight();
+            float videoProportion = (float) videoWidth / (float) videoHeight;
+
+            int screenWidth = holder.videoView.getWidth();
+            int screenHeight = holder.videoView.getHeight();
+            float screenProportion = (float) screenWidth / (float) screenHeight;
+
+            ViewGroup.LayoutParams lp = holder.videoView.getLayoutParams();
+
+            if (videoProportion > screenProportion) {
+                lp.width = screenWidth;
+                lp.height = (int) (screenWidth / videoProportion);
+            } else {
+                lp.height = screenHeight;
+                lp.width = (int) (screenHeight * videoProportion);
+            }
+
+            holder.videoView.setLayoutParams(lp);
         });
         holder.videoView.setOnErrorListener((mp, what, extra) -> {
             Log.e("VideosFireBaseAdapter", "Video error at position: " + position + ", what: " + what + ", extra: " + extra);
@@ -174,6 +205,7 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
         });
 
         holder.favorites.setOnClickListener(v -> {
+            holder.favorites.setImageResource(R.drawable.ic_fill_favorite);
             Log.d("VideosFireBaseAdapter", "Like button clicked for video: " + video.getVideoId());
             long newLikes = video.getLikes() + 1;
             updateLikesDislikes(video.getVideoId(), newLikes, video.getDislikes());
@@ -188,13 +220,27 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
             video.setDislikes(newDislikes);
             holder.textDislikes.setText(String.valueOf(newDislikes));
         });
+
+        holder.videoView.setOnClickListener(v -> {
+            if (holder.videoView.isPlaying()) {
+                holder.videoView.pause();
+            } else {
+                holder.videoView.start();
+            }
+        });
     }
 
     @Override
     public void onViewRecycled(@NonNull VideoViewHolder holder) {
         super.onViewRecycled(holder);
         holder.videoView.stopPlayback();
+        if (holder == currentPlayingHolder) {
+            currentPlayingHolder = null;
+        }
+
         Log.d("VideosFireBaseAdapter", "Video playback stopped for recycled view");
+
+
     }
 
     @Override
@@ -230,9 +276,9 @@ public class VideosFireBaseAdapter extends RecyclerView.Adapter<VideosFireBaseAd
     }
 
     private void updateLikesDislikes(String videoId, long likes, long dislikes) {
-        DatabaseReference videoRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("shortvideo").child(videoId);
+        DatabaseReference videoRef = FirebaseDatabase.getInstance()
+                .getReference("videos").child(videoId);
+
         videoRef.child("likes").setValue(likes);
         videoRef.child("dislikes").setValue(dislikes);
         Log.d("VideosFireBaseAdapter", "Updated likes: " + likes + ", dislikes: " + dislikes + " for video: " + videoId);

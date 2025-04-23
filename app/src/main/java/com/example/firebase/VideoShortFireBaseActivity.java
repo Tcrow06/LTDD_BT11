@@ -3,11 +3,17 @@ package com.example.firebase;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SnapHelper;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,6 +29,8 @@ public class VideoShortFireBaseActivity extends AppCompatActivity {
     private VideosFireBaseAdapter adapter;
     private List<Video1Model> videoList;
     private FirebaseAuth auth;
+
+    VideosFireBaseAdapter.VideoViewHolder currentPlayingHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +50,14 @@ public class VideoShortFireBaseActivity extends AppCompatActivity {
 
         // Khởi tạo RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+
+        SnapHelper snapHelper = new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerView);
+
         videoList = new ArrayList<>();
         adapter = new VideosFireBaseAdapter(videoList);
         recyclerView.setAdapter(adapter);
@@ -50,20 +65,50 @@ public class VideoShortFireBaseActivity extends AppCompatActivity {
         // Tải danh sách video
         loadVideos();
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    // Cuộn xong rồi, lấy view đang nằm chính giữa
+                    View snappedView = snapHelper.findSnapView(layoutManager);
+                    if (snappedView != null) {
+                        int position = layoutManager.getPosition(snappedView);
+                        playVideoAtPosition(position);
+                    }
+                }
+            }
+        });
+
+
 
     }
 
-    private void loadVideos() {
-        DatabaseReference videoRef = FirebaseDatabase.getInstance(
-                        "https://video-fire-base-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("shortvideo");
+    private void playVideoAtPosition(int position) {
+        if (currentPlayingHolder != null) {
+            currentPlayingHolder.videoView.pause();
+        }
 
+        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+        if (viewHolder instanceof VideosFireBaseAdapter.VideoViewHolder) {
+            currentPlayingHolder = (VideosFireBaseAdapter.VideoViewHolder) viewHolder;
+            currentPlayingHolder.videoView.start();
+        }
+    }
+
+    private void loadVideos() {
+
+        DatabaseReference videoRef = FirebaseDatabase.getInstance().getReference("videos");
         videoRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 videoList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Video1Model video = dataSnapshot.getValue(Video1Model.class);
+                    Video1Model video=null;
+                    try {
+                        video = dataSnapshot.getValue(Video1Model.class);
+                    }catch (Exception e){
+                        e.getMessage();
+                    }
                     if (video != null) {
                         video.setVideoId(dataSnapshot.getKey());
                         videoList.add(video);
@@ -79,4 +124,6 @@ public class VideoShortFireBaseActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
